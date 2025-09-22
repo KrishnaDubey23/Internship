@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+motor
+python-dotenv
+scikit-learn
+numpy
+pandas
+# note: do not install the standalone 'bson' package; pymongo provides bson

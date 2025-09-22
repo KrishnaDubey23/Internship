@@ -1,0 +1,23 @@
+[
+  {
+    "title": "Machine Learning Intern",
+    "company": "AI Labs",
+    "description": "Work on ML models for NLP and recommendation systems. Responsibilities include data preprocessing, model training, and evaluation.",
+    "skills": ["python", "pandas", "scikit-learn", "nlp"],
+    "location": "remote"
+  },
+  {
+    "title": "Frontend Intern",
+    "company": "Web Co",
+    "description": "Assist in building responsive React components and improving UX. Work closely with designers to implement new features.",
+    "skills": ["react", "javascript", "css"],
+    "location": "onsite"
+  },
+  {
+    "title": "Data Engineering Intern",
+    "company": "DataWorks",
+    "description": "Help build ETL pipelines, clean and transform large datasets, and maintain data warehouses.",
+    "skills": ["sql", "python", "airflow"],
+    "location": "remote"
+  }
+]
