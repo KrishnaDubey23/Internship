@@ -172,9 +172,6 @@ async def register(payload: RegisterRequest):
 
 @app.post("/login")
 async def login(payload: LoginRequest):
-    # Temporary debug wrapper: catch exceptions, print traceback to logs,
-    # and return the exception detail in the response so we can debug
-    # the 500 happening on the deployed Render instance.
     try:
         user = await users_col.find_one({"email": payload.email})
         if not user:
@@ -184,15 +181,16 @@ async def login(payload: LoginRequest):
         user["_id"] = str(user["_id"])
         return user
     except HTTPException:
-        # Re-raise HTTPExceptions unchanged (so 404 remains 404)
+        # Re-raise FastAPI HTTPExceptions unchanged
         raise
     except Exception as e:
+        # Temporary debug: print and return traceback to help diagnose the 500 error in deployment logs and response
         import traceback
-        traceback.print_exc()
-        # Return the error detail in the response for debugging.
-        # NOTE: This exposes internal error messages and should be removed
-        # after debugging is complete.
-        raise HTTPException(status_code=500, detail=str(e))
+        tb = traceback.format_exc()
+        print("--- Exception in /login ---")
+        print(tb)
+        # Return traceback in detail so we can see the error from remote test; remove this in production
+        raise HTTPException(status_code=500, detail=tb)
 
 
 @app.get("/users/{user_id}")
