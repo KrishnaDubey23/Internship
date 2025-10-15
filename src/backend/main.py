@@ -27,14 +27,39 @@ except Exception as e:
 
 app = FastAPI()
 
-# Allow frontend running on default CRA port
+# Configure CORS origins from environment so deployments (Render + Vercel)
+# can set the correct frontend origin without editing code.
+#
+# Usage: set ALLOWED_ORIGINS to a comma-separated list of origins, e.g.
+#   ALLOWED_ORIGINS="http://localhost:3000,https://your-app.vercel.app"
+# If you include "*" as an origin, credentials will be disabled because
+# browsers block credentialed requests with a wildcard origin.
+
+raw_allowed = os.getenv(
+    "ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"
+)
+allowed_origins = [o.strip() for o in raw_allowed.split(",") if o.strip()]
+
+# If user provided a wildcard '*' make sure credentials are not allowed
+allow_credentials = True
+if "*" in allowed_origins:
+    allow_credentials = False
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
-    allow_credentials=True,
+    allow_origins=allowed_origins,
+    allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+print(f"Configured CORS allowed origins: {allowed_origins}, allow_credentials={allow_credentials}")
+
+
+@app.get("/_cors")
+async def cors_info():
+    """Simple endpoint to return current CORS configuration for debugging deployments."""
+    return {"allowed_origins": allowed_origins, "allow_credentials": allow_credentials}
 
 
 class PyObjectId(ObjectId):
