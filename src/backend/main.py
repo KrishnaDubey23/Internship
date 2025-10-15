@@ -172,13 +172,27 @@ async def register(payload: RegisterRequest):
 
 @app.post("/login")
 async def login(payload: LoginRequest):
-    user = await users_col.find_one({"email": payload.email})
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    # Convert ObjectId to string and return user data
-    user["_id"] = str(user["_id"])
-    return user
+    # Temporary debug wrapper: catch exceptions, print traceback to logs,
+    # and return the exception detail in the response so we can debug
+    # the 500 happening on the deployed Render instance.
+    try:
+        user = await users_col.find_one({"email": payload.email})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        # Convert ObjectId to string and return user data
+        user["_id"] = str(user["_id"])
+        return user
+    except HTTPException:
+        # Re-raise HTTPExceptions unchanged (so 404 remains 404)
+        raise
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        # Return the error detail in the response for debugging.
+        # NOTE: This exposes internal error messages and should be removed
+        # after debugging is complete.
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/users/{user_id}")
